@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>DELIRIOS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-danger mb-4">
+    <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="{% url 'home' %}">
+        <img src="{% static 'manzanameme.jpg' %}" alt="Logo" width="80" height="80" class="d-inline-block align-text-top me-2">
+    </a>
+    <h1 class="navbar-text text-white fw-bold">DELIRIOS REVIEWS</h1>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+        
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+
+        </ul>
+
+        <form class="d-flex gap-2 align-items-center" method="GET">
+            
+            <input class="form-control" type="search" name="buscar" 
+                placeholder="Buscar título..." 
+                value="{{ busqueda_actual|default:'' }}" 
+                aria-label="Buscar">
+
+            <select class="form-select" name="categoria" style="max-width: 200px;">
+                <option value="">Categoría...</option>
+                {% for cat in categorias %}
+                    <option value="{{ cat.id }}" {% if cat.id == cat_actual %}selected{% endif %}>
+                        {{ cat.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <select class="form-select" name="participante" style="max-width: 200px;">
+                <option value="">Amigo...</option>
+                {% for part in participantes %}
+                    <option value="{{ part.id }}" {% if part.id == part_actual %}selected{% endif %}>
+                        {{ part.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button class="btn btn-primary" type="submit">Filtrar</button>
+            <a href="{% url 'home' %}" class="btn btn-outline-light">Limpiar</a>
+        </form>
+        <button class="btn btn-warning ms-3">
+            <a href="{% url 'agregar_pelicula' %}" class="text-dark text-decoration-none fw-bold">
+                <i class="bi bi-plus-circle-fill me-1"></i> Agregar Película
+            </a>
+
+        </div>
+    </div>
+    </nav>
+
+    <div class="container pb-5">
+
+        {% if not peliculas %}
+        <div class="alert alert-warning text-center mt-5">
+            No se encontraron películas con esos filtros. <a href="{% url 'home' %}">Ver todas</a>.
+        </div>
+        {% endif %}
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-6 g-4">
+            {% for pelicula in peliculas %}
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+                    {% if pelicula.imagen %}
+                    <img src="{{ pelicula.imagen.url }}" class="card-img-top" alt="{{ pelicula.titulo }}"
+                        style="height: 350px; object-fit: cover;">
+                    {% else %}
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center"
+                        style="height: 350px;">
+                        Sin Imagen
+                    </div>
+                    {% endif %}
+
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title fw-bold text-dark">{{ pelicula.titulo }}</h5>
+                            <span
+                                class="badge rounded-pill {% if pelicula.calificacion >= 7 %}bg-success{% elif pelicula.calificacion >= 5 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                ⭐  {{ pelicula.calificacion }}
+                            </span>
+                        </div>
+
+                        <h6 class="card-subtitle mb-2 text-muted small">
+                            {{ pelicula.categoria.nombre }}
+                        </h6>
+
+                        <p class="card-text text-secondary">
+                            {{ pelicula.sinopsis|truncatewords:20 }}
+                        </p>
+                    </div>
+
+                    <div
+                        class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center py-3">
+                        <small class="text-muted">
+                            Por: <strong>{{ pelicula.recomendado_por.nombre }}</strong>
+                        </small>
+                        <a href="{% url 'pelicula_detalle' pelicula.id %}" class="btn btn-sm btn-outline-dark">Ver Detalle</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
